@@ -1,5 +1,6 @@
-variable "REGION" {}
-variable "PROJECT_NAME" {}
+variable "PROJECT_NAME" {
+  description = "Name of the project"
+  type        = string
+  default     = "default-project"
+}
 
-# use data source to get all avalablility zones in region
-data "aws_availability_zones" "available_zones" {}

@@ -9,34 +9,22 @@
 
 # Please add any new subnet under here : 
 
-
-
-variable "VPC_CIDR" {
+variable "vpc_cidr_block" {
   description = "CIDR block for the VPC"
-  type        = string
 }
 
-variable "PROJECT_NAME" {
-  description = "Name of the project"
-  type        = string
+variable "enable_dns_hostnames" {
+  description = "Enable DNS hostnames for the VPC"
+  type        = bool
 }
 
-variable "PUBLIC_SUBNET_CIDR_1A" {
-  description = "CIDR block for the public subnet in availability zone 1a"
-  type        = string
+variable "internet_gateway_tags" {
+  description = "Tags for the Internet Gateway"
+  type        = map(string)
 }
 
-variable "PUBLIC_SUBNET_CIDR_2B" {
-  description = "CIDR block for the public subnet in availability zone 2b"
-  type        = string
+variable "subnet_cidr_blocks" {
+  description = "List of CIDR blocks for subnets"
+  type        = list(string)
 }
 
-variable "PRIVATE_SUBNET_CIDR_3A" {
-  description = "CIDR block for the private subnet in availability zone 3a"
-  type        = string
-}
-
-variable "PRIVATE_SUBNET_CIDR_4B" {
-  description = "CIDR block for the private subnet in availability zone 4b"
-  type        = string
-}
