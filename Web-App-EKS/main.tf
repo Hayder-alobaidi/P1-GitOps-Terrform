@@ -18,7 +18,7 @@ module "internet_gateway" {
   PROJECT_NAME = var.PROJECT_NAME
 }
 
-module "nat_gateway_routing" {
+module "EKS" {
   source = "./nat_gateway_routing"  # Path to the NAT Gateway and Routing module directory
 
   VPC_ID = module.vpc.vpc_id
