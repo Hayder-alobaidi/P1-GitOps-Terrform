@@ -1,49 +1,32 @@
+# main.tf
 
-# creating VPC
 module "vpc" {
-  source           = "../modules/vpc"
-  REGION           = var.REGION
-  PROJECT_NAME     = var.PROJECT_NAME
-  VPC_CIDR         = var.VPC_CIDR
-  PUB_SUB_1_A_CIDR = var.PUB_SUB_1_A_CIDR
-  PUB_SUB_2_B_CIDR = var.PUB_SUB_2_B_CIDR
-  PRI_SUB_3_A_CIDR = var.PRI_SUB_3_A_CIDR
-  PRI_SUB_4_B_CIDR = var.PRI_SUB_4_B_CIDR
+  source = "./vpc"  # Path to the VPC module directory
+
+  PROJECT_NAME = var.PROJECT_NAME
+  VPC_CIDR = var.VPC_CIDR
+  PUBLIC_SUBNET_CIDR_1A = var.PUBLIC_SUBNET_CIDR_1A
+  PUBLIC_SUBNET_CIDR_2B = var.PUBLIC_SUBNET_CIDR_2B
+  PRIVATE_SUBNET_CIDR_3A = var.PRIVATE_SUBNET_CIDR_3A
+  PRIVATE_SUBNET_CIDR_4B = var.PRIVATE_SUBNET_CIDR_4B
 }
 
-# cretea NAT-NAT-GW
-module "NAT-GW" {
-  source = "../modules/nat-gw"
+module "internet_gateway" {
+  source = "./internet_gateway"  # Path to the Internet Gateway module directory
 
-  PUB_SUB_1_A_ID = module.VPC.PUB_SUB_1_A_ID
-  IGW_ID         = module.VPC.IGW_ID
-  PUB_SUB_2_B_ID = module.VPC.PUB_SUB_2_B_ID
-  VPC_ID         = module.VPC.VPC_ID
-  PRI_SUB_3_A_ID = module.VPC.PRI_SUB_3_A_ID
-  PRI_SUB_4_B_ID = module.VPC.PRI_SUB_4_B_ID
-}
-
-
-module "IAM" {
-  source = "../modules/IAM"
+  VPC_ID = module.vpc.vpc_id
   PROJECT_NAME = var.PROJECT_NAME
 }
 
-module "EKS" {
-  source               = "../modules/EKS"
-  PROJECT_NAME         = var.PROJECT_NAME
-  EKS_CLUSTER_ROLE_ARN = module.IAM.EKS_CLUSTER_ROLE_ARN
-  PUB_SUB_1_A_ID       = module.VPC.PUB_SUB_1_A_ID
-  PUB_SUB_2_B_ID       = module.VPC.PUB_SUB_2_B_ID
-  PRI_SUB_3_A_ID       = module.VPC.PRI_SUB_3_A_ID
-  PRI_SUB_4_B_ID       = module.VPC.PRI_SUB_4_B_ID
+module "nat_gateway_routing" {
+  source = "./nat_gateway_routing"  # Path to the NAT Gateway and Routing module directory
+
+  VPC_ID = module.vpc.vpc_id
+  PROJECT_NAME = var.PROJECT_NAME
 }
 
+module "iam_role" {
+  source = "./iam_role"  # Path to the IAM Role module directory
 
-module "NODE_GROUP" {
-  source           = "../modules/Node-group"
-  EKS_CLUSTER_NAME = module.EKS.EKS_CLUSTER_NAME
-  NODE_GROUP_ARN   = module.IAM.NODE_GROUP_ROLE_ARN
-  PRI_SUB_3_A_ID   = module.VPC.PRI_SUB_3_A_ID
-  PRI_SUB_4_B_ID   = module.VPC.PRI_SUB_4_B_ID
+  PROJECT_NAME = var.PROJECT_NAME
 }
