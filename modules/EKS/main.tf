@@ -19,10 +19,10 @@ resource "aws_eks_cluster" "eks" {
 
     # List of subnet IDs where EKS resources will be placed
     subnet_ids = [
-      public_subnet_1a.id,
-      public_subnet_2b.id,
-      private_subnet_3a.id,
-      private_subnet_4b.id
+      var.public_subnet_ids[0],  # This is the first subnet in the list
+      var.public_subnet_ids[1],  # This is the second subnet in the list
+      var.private_subnet_ids[0], # This is the first private subnet in the list
+      var.private_subnet_ids[1]  # This is the second subnet in the list
     ]
   }
 

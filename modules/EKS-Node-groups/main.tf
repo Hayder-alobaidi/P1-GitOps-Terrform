@@ -37,7 +37,7 @@ resource "aws_iam_role_policy_attachment" "amazon_eks_worker_node_policy_general
 
 # Create an EKS node group for general worker nodes
 resource "aws_eks_node_group" "nodes_general" {
-  cluster_name = aws_eks_cluster.eks.name
+  cluster_name = var.eks_cluster_name
 
   node_group_name = "nodes-general"
 

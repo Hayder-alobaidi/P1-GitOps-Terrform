@@ -26,12 +26,14 @@ module "nat_gateways" {
   # No specific variables required for this module
 }
 
-module "eks_cluster" {
+module "EKS" {
   source = "../modules/EKS"
 
   eks_name        = "eks-cluster"
   eks_role_arn    = module.iam.eks_role_arn
   eks_version     = "1.27"
+  public_subnet_ids  = module.vpc.public_subnet_ids
+  private_subnet_ids = module.vpc.private_subnet_ids
   
 }
 
