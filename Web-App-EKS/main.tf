@@ -1,58 +1,36 @@
 module "vpc" {
-  source = "../modules/vpc"
-
-  vpc_cidr_block           = "10.0.0.0/16"
-  enable_dns_hostnames     = true
-  internet_gateway_tags    = {
-    Name        = "MyInternetGateway"
-    Environment = "Production"
-  }
-  subnet_cidr_blocks       = ["10.0.0.0/24", "10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
+  source                      = "../modules/vpc"
+  REGION                      = var.REGION
+  PROJECT_NAME                = var.PROJECT_NAME
 }
 
 module "iam" {
-  source = "../modules/IAM"
-
-  eks_cluster_name = module.eks_cluster.eks_cluster_name
-  eks_role_name    = "eks-cluster"
+  source                      = "../modules/IAM"
 }
 
 module "nat_gateways" {
-  source = "../modules/nat-gateways"
-  # No specific variables required for this module
+  source                      = "../modules/nat-gateways"
+  VPC_ID                      = module.vpc.VPC_ID
+  internet_gateway_id         = module.vpc.internet_gateway_id
+  PUBLIC_SUBNET_1A_ID         = module.vpc.PUBLIC_SUBNET_1A_ID
+  PUBLIC_SUBNET_2B_ID         = module.vpc.PUBLIC_SUBNET_2B_ID
+  PRIVATE_SUBNET_3A_ID        = module.vpc.PRIVATE_SUBNET_3A_ID
+  PRIVATE_SUBNET_4B_ID        = module.vpc.PRIVATE_SUBNET_4B_ID
 }
 
 module "EKS" {
   source = "../modules/EKS"
-
-  eks_name        = "eks-cluster"
-  eks_role_arn    = module.iam.eks_role_arn
-  eks_version     = "1.27"
-  public_subnet_ids  = module.vpc.public_subnet_ids
-  private_subnet_ids = module.vpc.private_subnet_ids
-  
+  EKS_CLUSTER_ROLE_ARN        = module.iam.EKS_CLUSTER_ROLE_ARN
+  PUBLIC_SUBNET_1A_ID         = module.vpc.PUBLIC_SUBNET_1A_ID
+  PUBLIC_SUBNET_2B_ID         = module.vpc.PUBLIC_SUBNET_2B_ID
+  PRIVATE_SUBNET_3A_ID        = module.vpc.PRIVATE_SUBNET_3A_ID
+  PRIVATE_SUBNET_4B_ID        = module.vpc.PRIVATE_SUBNET_4B_ID
 }
 
-module "eks_node_groups" {
-  source = "../modules/EKS-node-groups"
-
-  eks_cluster_name    = module.eks_cluster.eks_cluster_name
-  node_subnet_ids    = module.vpc.private_subnet_ids
-  node_role_arn      = module.iam.eks_role_arn
-  eks_version        = "1.27"
-  desired_node_size  = 3
-  node_instance_type = "t3.small"
-  ami_type           = "AL2_x86_64"
-  capacity_type      = "ON_DEMAND"
+module "EKS-Node-groups" {
+  source                      = "../modules/EKS-Node-groups"
+  EKS_CLUSTER_NAME            = module.EKS.EKS_CLUSTER_NAME
+  NODE_GROUP_ROLE_ARN         = module.iam.NODE_GROUP_ROLE_ARN
+  PRIVATE_SUBNET_3A_ID        = module.vpc.PRIVATE_SUBNET_3A_ID
+  PRIVATE_SUBNET_4B_ID        = module.vpc.PRIVATE_SUBNET_4B_ID
 }
-
-# Optional: Define outputs for any relevant information you want to access from the modules
-output "eks_cluster_name" {
-  value = module.eks_cluster.eks_cluster_name
-}
-
-output "node_group_name" {
-  value = module.eks_node_groups.node_group_name
-}
-
-# Add outputs from other modules as needed

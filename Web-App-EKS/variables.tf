@@ -1,6 +1,2 @@
-variable "PROJECT_NAME" {
-  description = "Name of the project"
-  type        = string
-  default     = "default-project"
-}
-
+variable "PROJECT_NAME" {}
+variable REGION{}

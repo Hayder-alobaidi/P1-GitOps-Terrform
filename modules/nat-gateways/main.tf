@@ -1,11 +1,11 @@
 # Create Elastic IP resources for NAT Gateways
 resource "aws_eip" "nat1" {
   # These Elastic IPs depend on the Internet Gateway being created first
-  depends_on = [aws_internet_gateway.internet_gateway]
+  depends_on = [var.internet_gateway_id]
 }
 
 resource "aws_eip" "nat2" {
-  depends_on = [aws_internet_gateway.internet_gateway]
+  depends_on = [var.internet_gateway_id]
 }
 
 # Create NAT Gateway resources
@@ -14,7 +14,7 @@ resource "aws_nat_gateway" "gw1" {
   allocation_id = aws_eip.nat1.id
 
   # Associate this NAT Gateway with the public subnet (public_subnet_1a)
-  subnet_id = aws_subnet.public_subnet_1a.id
+  subnet_id = var.PUBLIC_SUBNET_1A_ID
 
   # Assign a tag for easy identification
   tags = {
@@ -24,7 +24,7 @@ resource "aws_nat_gateway" "gw1" {
 
 resource "aws_nat_gateway" "gw2" {
   allocation_id = aws_eip.nat2.id
-  subnet_id     = aws_subnet.public_subnet_2b.id
+  subnet_id     = var.PUBLIC_SUBNET_2B_ID
 
   tags = {
     Name = "NAT 2"
@@ -34,12 +34,12 @@ resource "aws_nat_gateway" "gw2" {
 # Create public route table
 resource "aws_route_table" "public" {
   # Associate this route table with the VPC created earlier (P1_vpc)
-  vpc_id = aws_vpc.P1_vpc.id 
+  vpc_id = var.VPC_ID
 
   # Create a default route through the Internet Gateway (P1_vpc)
-  route = {
+  route {
     cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.P1_vpc.id
+    gateway_id = var.internet_gateway_id
   }
 
   # Assign a tag for easy identification
@@ -50,10 +50,10 @@ resource "aws_route_table" "public" {
 
 # Create private route tables with NAT Gateway routes
 resource "aws_route_table" "private1" {
-  vpc_id = aws_vpc.P1_vpc.id 
+  vpc_id = var.VPC_ID 
 
   # Create a default route through the NAT Gateway gw1
-  route = {
+  route {
     cidr_block     = "0.0.0.0/0"
     nat_gateway_id = aws_nat_gateway.gw1.id
   }
@@ -65,10 +65,10 @@ resource "aws_route_table" "private1" {
 }
 
 resource "aws_route_table" "private2" {
-  vpc_id = aws_vpc.P1_vpc.id 
+  vpc_id = var.VPC_ID
 
   # Create a default route through the NAT Gateway gw2
-  route = {
+  route {
     cidr_block     = "0.0.0.0/0"
     nat_gateway_id = aws_nat_gateway.gw2.id
   }
@@ -82,25 +82,25 @@ resource "aws_route_table" "private2" {
 # Associate public and private route tables with respective subnets
 resource "aws_route_table_association" "public1" {
   # Associate the public route table with the public subnet public_subnet_1a
-  subnet_id      = aws_subnet.public_subnet_1a.id
+  subnet_id      = var.PUBLIC_SUBNET_1A_ID
   route_table_id = aws_route_table.public.id
 }
 
 resource "aws_route_table_association" "public2" {
   # Associate the public route table with the public subnet public_subnet_2b
-  subnet_id      = aws_subnet.public_subnet_2b.id
+  subnet_id      = var.PUBLIC_SUBNET_2B_ID
   route_table_id = aws_route_table.public.id
 }
 
 resource "aws_route_table_association" "private1" {
   # Associate the private route table with the private subnet private_subnet_3a
-  subnet_id      = aws_subnet.private_subnet_3a.id
+  subnet_id      = var.PRIVATE_SUBNET_3A_ID
   route_table_id = aws_route_table.private1.id
 }
 
 resource "aws_route_table_association" "private2" {
   # Associate the private route table with the private subnet private_subnet_4b
-  subnet_id      = aws_subnet.private_subnet_4b.id
+  subnet_id      = var.PRIVATE_SUBNET_4B_ID
   route_table_id = aws_route_table.private2.id
 }
 

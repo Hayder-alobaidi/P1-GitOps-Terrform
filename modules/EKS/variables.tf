@@ -1,11 +1,7 @@
-variable "eks_name" {
-  description = "Name of the EKS cluster"
-}
+variable "EKS_CLUSTER_ROLE_ARN" {}
 
-variable "eks_role_arn" {
-  description = "ARN of the IAM role for EKS"
-}
+variable "PUBLIC_SUBNET_1A_ID" {}
+variable "PUBLIC_SUBNET_2B_ID" {}
 
-variable "eks_version" {
-  description = "Version of EKS to use"
-}
+variable "PRIVATE_SUBNET_3A_ID" {}
+variable "PRIVATE_SUBNET_4B_ID" {}

@@ -4,7 +4,7 @@ resource "aws_eks_cluster" "eks" {
   name = "eks"
 
   # ARN of the IAM role that EKS will assume
-  role_arn = aws_eks_cluster.eks.arn 
+  role_arn = var.EKS_CLUSTER_ROLE_ARN
 
   # Version of EKS to use
   version = "1.27"
@@ -19,15 +19,12 @@ resource "aws_eks_cluster" "eks" {
 
     # List of subnet IDs where EKS resources will be placed
     subnet_ids = [
-      var.public_subnet_ids[0],  # This is the first subnet in the list
-      var.public_subnet_ids[1],  # This is the second subnet in the list
-      var.private_subnet_ids[0], # This is the first private subnet in the list
-      var.private_subnet_ids[1]  # This is the second subnet in the list
+      var.PUBLIC_SUBNET_1A_ID,
+      var.PUBLIC_SUBNET_2B_ID,
+      var.PRIVATE_SUBNET_3A_ID,
+      var.PRIVATE_SUBNET_4B_ID
     ]
   }
 
-  # Ensure the EKS cluster creation depends on IAM policy attachment
-  depends_on = [ 
-    aws_iam_role_policy_attachment.amazon_eks_cluster_policy
-  ]
+
 }

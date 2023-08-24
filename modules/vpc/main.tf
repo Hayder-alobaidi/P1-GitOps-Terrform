@@ -1,3 +1,6 @@
+# VPC total IPs: 65,536 usable IPs
+# Each /24 has 256 IPs 
+
 
 # Create the VPC 
 resource "aws_vpc" "P1_vpc" {
@@ -27,7 +30,7 @@ data "aws_availability_zones" "available_zones" {}
 resource "aws_subnet" "public_subnet_1a" {
   vpc_id                  = aws_vpc.P1_vpc.id
   cidr_block              = "10.0.0.0/24"
-  availability_zone      = "data.aws_availability_zones.available_zones.names[0]"
+  availability_zone      = data.aws_availability_zones.available_zones.names[0]
   map_public_ip_on_launch = true
 
    tags = {
@@ -54,7 +57,7 @@ resource "aws_subnet" "public_subnet_2b" {
 resource "aws_subnet" "private_subnet_3a" {
   vpc_id     = aws_vpc.P1_vpc.id
   cidr_block = "10.0.2.0/24"
-  availability_zone = data.aws_availability_zones.available_zones.names[3]
+  availability_zone = data.aws_availability_zones.available_zones.names[0]
 
   tags = {
     Name                              = "private_subnet_3a"
@@ -66,7 +69,7 @@ resource "aws_subnet" "private_subnet_3a" {
 resource "aws_subnet" "private_subnet_4b" {
   vpc_id     = aws_vpc.P1_vpc.id
   cidr_block = "10.0.3.0/24"
-  availability_zone = data.aws_availability_zones.available_zones.names[4]
+  availability_zone = data.aws_availability_zones.available_zones.names[1]
 
    tags = {
     Name                              = "private_subnet_4b"

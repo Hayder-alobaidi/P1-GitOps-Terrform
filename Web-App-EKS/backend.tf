@@ -1,15 +1,34 @@
-terraform {
-  backend "s3" {
+
+
+# Create S3 bucket
+resource "aws_s3_bucket" "terraform_bucket" {
     bucket = "terraform-s3-state-bucket-9494"
-    dynamodb_table = "terraform_statelock"
-    key = "global/mystatefile/terraform.tfstate"
-    region = "us-east-1"
-    encrypt = true
-  }
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 4.0" # any version grater than 4.0 
+
+    lifecycle {
+      prevent_destroy = true
     }
-  }
+
+    versioning {
+        enabled = true
+    }
+
+    server_side_encryption_configuration {
+        rule {
+            apply_server_side_encryption_by_default {
+                sse_algorithm = "AES256"
+            }
+        }
+    }
+}
+
+# Create Dynamodb
+resource "aws_dynamodb_table" "terraform_statelock" {
+    name = "terraform_statelock"
+    billing_mode = "PAY_PER_REQUEST"
+    hash_key = "LockID"
+
+    attribute {
+      name = "LockID"
+      type = "S"
+    }
 }
